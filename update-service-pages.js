@@ -191,6 +191,15 @@ async function updateServices () {
       serviceId
     )
 
+    // Portfolio embed: ensure teefax serve directory has no stale pages.
+    // This keeps the manifest + page list strictly aligned with the uni-ceefax checkout.
+    if (serviceId === CONST.SERVICE_TEEFAX) {
+      try {
+        fs.rmSync(serviceServeDir, { recursive: true, force: true })
+      } catch (e) {}
+      fs.mkdirSync(serviceServeDir, { recursive: true })
+    }
+
     const serviceManifestFile = path.join(
       serviceServeDir,
       'manifest.json'

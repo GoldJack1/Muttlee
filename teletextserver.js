@@ -160,6 +160,13 @@ if (CONFIG[CONST.CONFIG.SERVICES_AVAILABLE]) {
 
     ...serviceGroups
   }
+
+  // Portfolio embed: show ONLY the single teletext service backed by uni-ceefax.
+  // This affects both the server-rendered service dropdown and the client manifest dropdown.
+  const onlyServiceId = CONST.SERVICE_TEEFAX
+  if (templateVars.SERVICES_AVAILABLE && templateVars.SERVICES_AVAILABLE[onlyServiceId]) {
+    templateVars.SERVICES_AVAILABLE = { [onlyServiceId]: templateVars.SERVICES_AVAILABLE[onlyServiceId] }
+  }
 }
 
 if (CONFIG[CONST.CONFIG.SHOW_CONSOLE_LOGO] === true) {
