@@ -193,8 +193,15 @@ app.use(
 
         // further modify / filter this config key's data?
         if (key === CONST.CONFIG.SERVICES_AVAILABLE) {
+          // Only expose the single service we care about for this portfolio embed.
+          // This keeps the UI focused on your `uni-ceefax` pages only.
+          const onlyServiceId = CONST.SERVICE_TEEFAX
+          const filteredServices = {}
+
           for (const i in configKeyData) {
-            configKeyData[i] = {
+            if (i !== onlyServiceId) continue
+
+            filteredServices[i] = {
               name: configKeyData[i].name,
               headerTitle: configKeyData[i].headerTitle,
               url: configKeyData[i].url,
@@ -207,6 +214,8 @@ app.use(
               credit: configKeyData[i].credit
             }
           }
+          content[key] = filteredServices
+          continue
         }
 
         content[key] = configKeyData
