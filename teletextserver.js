@@ -435,20 +435,27 @@ function newConnection (socket) {
     return
   }
 
-  if ( typeof socket.handshake.headers.referer === 'undefined') {
-    return
+  // Some browsers / setups may omit `Referer` for direct navigations.
+  // Previously we returned early, which prevented the server from initializing
+  // page/service state and listeners. Fall back to defaults when missing.
+  const refererHeader = socket.handshake.headers.referer
+  const hostHeader = socket.handshake.headers.host || 'localhost'
+
+  let viewerUrl
+  if (typeof refererHeader === 'string' && refererHeader.length > 0) {
+    viewerUrl = new URL(refererHeader)
+  } else {
+    viewerUrl = new URL(`http://${hostHeader}/`)
   }
-  // determine parameters from socket URL
-  console.log("[teletextServer::newConnection] clientIp="+clientIp)
-  console.log(socket.handshake.headers.referer)
-  const viewerUrl = new URL(socket.handshake.headers.referer)
+
+  // determine parameters from viewer URL (if present)
   const viewerSearchParams = new URLSearchParams(viewerUrl.search)
 
   const socketUrl = new URL(socket.handshake.url, 'http://example.com')
   const socketSearchParams = new URLSearchParams(socketUrl.search)
 
   let service = socketSearchParams.get('service')
-  const page = viewerSearchParams.get('page')
+  const pageParam = viewerSearchParams.get('page')
 
   // ensure service name is valid
   const servicesData = CONFIG[CONST.CONFIG.SERVICES_AVAILABLE]
@@ -469,10 +476,10 @@ function newConnection (socket) {
   // set default page number if none supplied
   let p
 
-  if (page === undefined) {
+  if (pageParam == null) {
     p = CONST.PAGE_MIN
   } else {
-    p = parseInt(`0x${page}`, 16)
+    p = parseInt(`0x${pageParam}`, 16)
   }
 
   // If there is no page=nnn in the URL then default to CONST.PAGE_MIN
