@@ -45,7 +45,7 @@ const CONFIG = {
   ],
 
   [CONST.CONFIG.TITLE]: 'Muttlee',
-  [CONST.CONFIG.HEADER_TITLE]: 'Teefax',
+  [CONST.CONFIG.HEADER_TITLE]: 'Webtest',
 
   // Banned IP addresses, all of them Amazon AWS bots making annoying connections during debugging
   [CONST.CONFIG.BANNED_IP_ADDRESSES]: [
@@ -114,7 +114,7 @@ const CONFIG = {
   // [!] When adding or removing items, constants.js also needs to be updated
   [CONST.CONFIG.SERVICES_AVAILABLE]: {
     [CONST.SERVICE_TEEFAX]: {
-      name: 'Teefax',
+      name: 'Webtest',
       url: '//www.xenoxxx.com',
       port: 80,
 
