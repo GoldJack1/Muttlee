@@ -72,6 +72,10 @@ let changed
 // block
 let blockStart // block select
 
+// Keep current page visible while loading the next one.
+// We apply the blank signal only when the first row arrives.
+let pendingBlankData = null
+
 /** mapKey
  *  \brief Maps a keyboard key to a teletext code
  * Currently only maps English but should be extended to at least WST
@@ -993,6 +997,14 @@ function setRow (r) {
   }
   if (!matchpage(r)) return
   if (r.id !== gClientID && gClientID !== null) return // Not for us?
+
+  // Defer blanking until we actually receive first row data for the target page.
+  // This avoids a flash-to-black while waiting for socket/file IO.
+  if (pendingBlankData) {
+    applyBlankNow(pendingBlankData)
+    pendingBlankData = null
+  }
+
   if (r.y < 25) {
     myPage.setRow(r.y, r.rowText)
   } else if (r.y === 28) {
@@ -1059,6 +1071,11 @@ function setBlank (data) { // 'blank' wsfn cpb
   if (!matchpage(data)) return
   if (data.id !== gClientID && gClientID !== null) return // Not for us?
 
+  // Defer blank until first row of new page is received.
+  pendingBlankData = data
+}
+
+function applyBlankNow (data) {
   myPage.setBlank()
   myPage.setLocked(false)
 
