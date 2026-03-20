@@ -485,7 +485,7 @@ function newConnection (socket) {
 
   LOG.fn(
     ['teletextserver', 'newConnection'],
-    `service=${service}, page=${page}, requested service was=${socketSearchParams.get('service')} socket.handshake.url=${socket.handshake.url}`,
+    `service=${service}, page=${pageParam}, requested service was=${socketSearchParams.get('service')} socket.handshake.url=${socket.handshake.url}`,
     LOG.LOG_LEVEL_VERBOSE
   )
 
