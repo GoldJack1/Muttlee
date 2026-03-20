@@ -1,3 +1,4 @@
+const path = require('path')
 const CONST = require('./constants.js');
 
 
@@ -13,21 +14,25 @@ const CONFIG = {
   // (Note: service pages are not actually served by Muttlee from here
   //  they need additional renaming first, and are then served from
   //  CONST.CONFIG.SERVICE_PAGES_SERVE_DIR defined below).
-  [CONST.CONFIG.SERVICE_PAGES_DIR]: '/var/www/teletext-services',
+  // Render doesn't have `/var/www/...` by default. Keep these inside the repo
+  // so `update-service-pages.js` can clone + write safely.
+  [CONST.CONFIG.SERVICE_PAGES_DIR]: path.join(__dirname, 'teletext-services'),
 
   // (Note: this is the root directory for the live service pages,
   //  within it should be individual service subdirectories
   //  e.g. /var/www/private/onair/teefax, /var/www/private/onair/d2k,
   //  etc. matching the id's of the services defined below in
   //  CONST.CONFIG.SERVICES_AVAILABLE)
-  [CONST.CONFIG.SERVICE_PAGES_SERVE_DIR]: '/var/www/private/onair',
+  // Where `update-service-pages.js` copies `.tti` pages + writes `manifest.json`
+  // for consumption by `teletextserver.js`.
+  [CONST.CONFIG.SERVICE_PAGES_SERVE_DIR]: path.join(__dirname, 'private', 'onair'),
 
-  [CONST.CONFIG.PAGE_404_PATH]: '/var/www/private/p404.tti',
-  [CONST.CONFIG.PAGE_404_EDITABLE_PATH]: '/var/www/private/p404_editable.tti',
+  [CONST.CONFIG.PAGE_404_PATH]: path.join(__dirname, 'private', 'p404.tti'),
+  [CONST.CONFIG.PAGE_404_EDITABLE_PATH]: path.join(__dirname, 'private', 'p404_editable.tti'),
 
-  [CONST.CONFIG.LOGO_SVG_PATH]: '/var/www/private/muttlee_logo.svg',
-  [CONST.CONFIG.ZAPPER_STANDARD_SVG_PATH]: '/var/www/private/zapper_standard.svg',
-  [CONST.CONFIG.ZAPPER_COMPACT_SVG_PATH]: '/var/www/private/zapper_compact.svg',
+  [CONST.CONFIG.LOGO_SVG_PATH]: path.join(__dirname, 'private', 'muttlee_logo.svg'),
+  [CONST.CONFIG.ZAPPER_STANDARD_SVG_PATH]: path.join(__dirname, 'private', 'zapper_standard.svg'),
+  [CONST.CONFIG.ZAPPER_COMPACT_SVG_PATH]: path.join(__dirname, 'private', 'zapper_compact.svg'),
 
   [CONST.CONFIG.SHOW_CONSOLE_LOGO]: true,
   [CONST.CONFIG.CONSOLE_LOGO_CHAR_ARRAY]: [
@@ -52,7 +57,8 @@ const CONFIG = {
   ],
 
   [CONST.CONFIG.TELETEXT_VIEWER_SERVE_HTTP]: true,
-  [CONST.CONFIG.TELETEXT_VIEWER_SERVE_HTTP_PORT]: 8080,
+  // Render injects `PORT` for web services; fall back to 8080 for local runs.
+  [CONST.CONFIG.TELETEXT_VIEWER_SERVE_HTTP_PORT]: process.env.PORT ? parseInt(process.env.PORT, 10) : 8080,
 
   [CONST.CONFIG.TELETEXT_VIEWER_SERVE_HTTPS]: false,
   [CONST.CONFIG.TELETEXT_VIEWER_SERVE_HTTPS_PORT]: 443,
@@ -120,7 +126,9 @@ const CONFIG = {
         [769, 799],
       ],
       repoType: 'svn',
-      updateUrl: 'http://teastop.plus.com/svn/teletext/',
+      // Use your own `.tti` pages as the default teletext service.
+      repoType: 'git',
+      updateUrl: 'https://github.com/GoldJack1/uni-ceefax',
       updateInterval: 60,
     },
 
@@ -135,7 +143,8 @@ const CONFIG = {
       forceServiceHeader: true,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/spark-teletext/spark-teletext.git',
+      // Skip fetching for this portfolio embed (avoids large/slow clones at startup).
+      updateUrl: '',
       updateInterval: 60,
     },
 
@@ -146,10 +155,11 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'git@github.com:teletexx/service-artfax.git',
+      updateUrl: '',
       updateInterval: 60,
 
-      isEditable: true,
+      // Disable write-back to keep the deployment safe.
+      isEditable: false,
     },
 
     [CONST.SERVICE_NEMETEXT]: {
@@ -159,7 +169,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/JamieNemeth/nemetext.git',
+      updateUrl: '',
       updateInterval: 60,
       isEditable: false,
     },
@@ -170,7 +180,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/teletexx/service-bbc1980.git',
+      updateUrl: '',
       updateInterval: 1440,
     },
 
@@ -180,7 +190,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/teletexx/service-digitiser2k.git',
+      updateUrl: '',
       updateInterval: 1440,
     },
 
@@ -190,7 +200,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/teletexx/service-kindie.git',
+      updateUrl: '',
       updateInterval: 1440,
     },
 
@@ -200,7 +210,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/teletexx/service-archive.git',
+      updateUrl: '',
       updateInterval: 1440,
     },
 
@@ -210,7 +220,7 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'https://github.com/teletexx/service-turner.git',
+      updateUrl: '',
       updateInterval: 1440,
     },
 
@@ -220,10 +230,11 @@ const CONFIG = {
       port: 80,
 
       repoType: 'git',
-      updateUrl: 'git@github.com:peterkvt80/service-wiki.git',
+      updateUrl: '',
       updateInterval: 10,
 
-      isEditable: true,
+      // Disable write-back to keep the deployment safe.
+      isEditable: false,
     },
 
     [CONST.SERVICE_XENOFAX]: {

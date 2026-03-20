@@ -31,6 +31,12 @@ const PACKAGE_JSON = JSON.parse(
 const CONST = require('./constants.js')
 const CONFIG = require('./config.js')
 
+// Ensure base directories exist (Render filesystem may start empty).
+const servicePagesDir = CONFIG[CONST.CONFIG.SERVICE_PAGES_DIR]
+const serviceServeDirBase = CONFIG[CONST.CONFIG.SERVICE_PAGES_SERVE_DIR]
+if (servicePagesDir) fs.mkdirSync(servicePagesDir, { recursive: true })
+if (serviceServeDirBase) fs.mkdirSync(serviceServeDirBase, { recursive: true })
+
 // variables
 const PAGE_FILE_EXT = '.tti'
 
@@ -167,6 +173,13 @@ async function updateServices () {
     }
 
     const serviceData = CONFIG[CONST.CONFIG.SERVICES_AVAILABLE][serviceId]
+
+    // If a service has no `updateUrl`, we skip fetching/copying its pages.
+    // This keeps Render startup fast and avoids failures when optional services
+    // aren't cloned locally.
+    if (!serviceData.updateUrl) {
+      continue
+    }
 
     const serviceTargetDir = path.join(
       CONFIG[CONST.CONFIG.SERVICE_PAGES_DIR],
