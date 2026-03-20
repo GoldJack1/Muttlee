@@ -249,7 +249,10 @@ function setup () {
   }
   // Need to fix this for SSL [!] @todo
   
-  let serverPath = "/muttlee/socket.io"
+  // The socket.io server is mounted at `/socket.io` on the deployed Muttlee server.
+  // Using `/muttlee/socket.io` makes the client hit the HTML fallback route,
+  // which prevents `id`/`load` events and results in a blank viewer.
+  let serverPath = "/socket.io"
   
   // connect via socket.io to server
   socket = io.connect({
@@ -1060,7 +1063,8 @@ function setBlank (data) { // 'blank' wsfn cpb
   myPage.setLocked(false)
 
   // For some reason, we can end up with CONST.EDITMODE_INSERT and this stops the cursor from blinking
-  if (myPage.getEditMode() > CONST.EDITMODE_EDIT) {    myPage.setEditMode(CONST.EDITMODE_EDIT)
+  if (myPage.getEditMode() > CONST.EDITMODE_EDIT) {
+    myPage.setEditMode(CONST.EDITMODE_EDIT)
   }
 
   // clear the description too
